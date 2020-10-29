@@ -1,0 +1,68 @@
+---
+title: "ECON691_L1"
+output: html_document
+---
+
+```{r cars}
+library(plyr)
+library(dplyr)
+library(textclean)
+# tm: remove whitespace, remove words, remove punctuation , remove numbers....
+library(tm)
+library(textstem)
+```
+
+
+```{r}
+text <- replace_contraction(emails$Message)
+text <- tolower(text)
+text <- gsub("[^\001-\177]",'',text, perl = TRUE)
+```
+
+```{r}
+# split letters into list
+text <- strsplit(text, " ")
+```
+
+```{r}
+text <- unlist(
+lapply(text, function(x) {
+  paste(x[!grep(".com|.edu|.net", x)], collapse = " ")
+}))
+
+```
+
+```{r}
+VectorSource(text)
+text <- VCorpus(VectorSource(text))
+```
+
+```{r}
+# creat own stopwords list, remove and add new words
+stopwords <- stopwords()
+non_stopwords <- c("you")
+stopwords <- stopwords[which(!stopwords %in% non_stopwords)]
+extra_stopwords <- c("case")
+stopwords <- c(stopwords, extra_stopwords)
+```
+
+```{r}
+text <- tm_map(text,function(x) {removeWords(x, stopwords)})
+text <- tm_map(text, function(x) {removePunctuation((x))})
+text <- tm_map(text, function(x) {removeNumbers((x))})
+text <- tm_map(text, function(x) {stripWhitespace((x))})
+```
+
+```{r}
+lapply(text, function(x) {x$content})
+```
+
+
+```{r}
+# stemming and lemmatizaztion
+# lemmatizaztion is more popular, we do not need to use both methods.
+stem_strings()
+
+lemmatize_strings()
+```
+
